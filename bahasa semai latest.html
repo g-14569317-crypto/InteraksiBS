@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Interaktif Bahasa Semai Tahun 4</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', 'Fredoka', 'Segoe UI', cursive, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #70A1FF 0%, #E28743 50%, #FFA502 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 900px;
+      background: #FFFFFF;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      border: 6px solid #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      min-height: 620px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Header Navigasi Bar */
+    .app-header {
+      background: #2E86DE;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid #1B65B1;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-badge {
+      width: 46px;
+      height: 46px;
+      background: #FFF;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 26px;
+      border: 3px solid #FFDA79;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .audio-btn-global {
+      background: #FF9F43;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 3px 0 #E67E22;
+    }
+
+    /* Skrin Utama */
+    .screen {
+      display: none;
+      padding: 25px 20px;
+      flex: 1;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Skrin Login */
+    .login-box {
+      text-align: center;
+      margin: auto;
+      max-width: 450px;
+      width: 100%;
+    }
+
+    .app-title {
+      color: #2E86DE;
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .app-subtitle {
+      color: #576574;
+      margin-bottom: 20px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #2C3E50;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 3px solid #C8D6E5;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .avatar-selector {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .avatar-opt {
+      font-size: 32px;
+      padding: 8px 14px;
+      border: 3px solid #C8D6E5;
+      border-radius: 14px;
+      cursor: pointer;
+      background: #F8F9FA;
+      transition: all 0.2s;
+    }
+
+    .avatar-opt.selected {
+      border-color: #FF9F43;
+      background: #FFEAA7;
+      transform: scale(1.1);
+    }
+
+    /* Butang Utama */
+    .btn-main {
+      background: #10AC84;
+      color: white;
+      border: none;
+      padding: 12px 26px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #0E8668;
+      transition: all 0.2s;
+    }
+
+    .btn-main:hover {
+      background: #12B88F;
+    }
+
+    .btn-main:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #0E8668;
+    }
+
+    /* Peta Laluan Pembelajaran (Dashboard) */
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .map-card {
+      background: #F8F9FA;
+      border: 3px solid #C8D6E5;
+      border-radius: 16px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .map-card.active-step {
+      border-color: #FF9F43;
+      background: #FFF9E6;
+    }
+
+    .map-card.completed {
+      border-color: #10AC84;
+      background: #E8F8F5;
+    }
+
+    /* Kad Soalan & Interaksi */
+    .activity-card {
+      background: #F8F9FA;
+      border: 3px solid #E2E8F0;
+      border-radius: 18px;
+      padding: 20px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .instruction-box {
+      background: #EBF8FF;
+      border-left: 5px solid #3182CE;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: left;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .btn-choice {
+      background: #FFFFFF;
+      border: 3px solid #CBD5E0;
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #2D3748;
+      transition: all 0.2s;
+    }
+
+    .btn-choice:hover {
+      border-color: #54A0FF;
+      background: #EBF8FF;
+    }
+
+    .feedback-box {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      min-height: 32px;
+    }
+
+    /* Langkah 2: Pengelasan Kad Engrok */
+    .sorting-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .drop-zone {
+      flex: 1;
+      min-width: 200px;
+      background: #EDF2F7;
+      border: 3px dashed #CBD5E0;
+      border-radius: 14px;
+      padding: 15px;
+      min-height: 180px;
+    }
+
+    .drop-zone h4 {
+      color: #2B6CB0;
+      margin-bottom: 10px;
+    }
+
+    .cards-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .word-card {
+      background: #FF9F43;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #E67E22;
+      user-select: none;
+    }
+
+    /* Langkah 4: Bina Ayat */
+    .sentence-builder {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      min-height: 60px;
+      background: #EDF2F7;
+      border: 2px dashed #A0AEC0;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 15px 0;
+    }
+
+    .audio-icon-btn {
+      background: #54A0FF;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <!-- Navigasi Bar Atas -->
+  <header class="app-header">
+    <div class="user-profile">
+      <div class="avatar-badge" id="header-avatar">🐯</div>
+      <div>
+        <div id="header-name" style="font-weight: bold; font-size: 16px;">wak Nari</div>
+        <div style="font-size: 11px; opacity: 0.9;">Bahasa Semai - 4 Amanah</div>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div>⭐ <span id="star-count">0</span></div>
+      <div>🎯 <span id="score-count">0</span></div>
+    </div>
+    <button class="audio-btn-global" onclick="testAudio()">🔊 Uji Suara</button>
+  </header>
+
+  <!-- Skrin 0: Log Masuk -->
+  <div id="screen-login" class="screen active">
+    <div class="login-box">
+      <div style="font-size: 50px; margin-bottom: 10px;">📚🏫</div>
+      <h1 class="app-title">Bahasa Semai (Tahun 4)</h1>
+      <p class="app-subtitle">Unit 16: Duniak lemu penanei<br><strong>Kernal pasti benentuk engrok (Suku Kate Tebuke)</strong></p>
+
+      <div class="input-group">
+        <label for="student-name">Cacat Nanek Mured (Nama Murid):</label>
+        <input type="text" id="student-name" placeholder="Isi nama awok ku te..." value="wak Nari">
+      </div>
+
+      <label style="font-weight: bold; display: block; margin-bottom: 10px;">Pilih Gambar Avatarmu:</label>
+      <div class="avatar-selector">
+        <div class="avatar-opt" onclick="changeAvatar(this, '👧')">👧</div>
+        <div class="avatar-opt" onclick="changeAvatar(this, '👦')">👦</div>
+        <div class="avatar-opt" onclick="changeAvatar(this, '🌟')">🌟</div>
+        <div class="avatar-opt selected" onclick="changeAvatar(this, '🐯')">🐯</div>
+      </div>
+
+      <button type="button" class="btn-main" onclick="startLearning()">Mula Benelajar 🚀</button>
+    </div>
+  </div>
+
+  <!-- Skrin Peta Modul RPH -->
+  <div id="screen-dashboard" class="screen">
+    <h2 style="color: #2E86DE; text-align: center;">Peta Latihan Benelajar RPH</h2>
+    <p style="text-align: center; color: #718096; font-size: 14px;">Selesaikan aktiviti mengikut urutan langkah di bawah!</p>
+    
+    <div class="map-grid">
+      <div class="map-card active-step" id="card-step0" onclick="openStep('screen-induksi')">
+        <h3>Set Induksi</h3>
+        <p>Gambar Situasi & Soal Jawab</p>
+      </div>
+      <div class="map-card" id="card-step1" onclick="openStep('screen-step1')">
+        <h3>Langkah 1</h3>
+        <p>Pengenalan Suku Kate</p>
+      </div>
+      <div class="map-card" id="card-step2" onclick="openStep('screen-step2')">
+        <h3>Langkah 2</h3>
+        <p>Aktiviti Kad Engrok (8 Kad)</p>
+      </div>
+      <div class="map-card" id="card-step3" onclick="openStep('screen-step3')">
+        <h3>Langkah 3</h3>
+        <p>Lembaran Kerjak 4 Engrok</p>
+      </div>
+      <div class="map-card" id="card-step4" onclick="openStep('screen-step4')">
+        <h3>Langkah 4</h3>
+        <p>Bina Ayat Suku Kate Tebuke</p>
+      </div>
+      <div class="map-card" id="card-step5" onclick="openStep('screen-penutup')">
+        <h3>Penutup</h3>
+        <p>Rumusan & Sijil Murid</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skrin Set Induksi -->
+  <div id="screen-induksi" class="screen">
+    <div class="instruction-box">
+      <span><strong>Set Induksi:</strong> Perhatikan gambar di bawah dan pilih perbuatan yang betul.</span>
+      <button class="audio-icon-btn" onclick="speak('Perhatikan gambar di bawah dan pilih perbuatan yang betul.')">🔊</button>
+    </div>
+
+    <div class="activity-card">
+      <div style="font-size: 60px; margin-bottom: 10px;">📖✍️</div>
+      <p style="font-size: 18px; font-weight: bold; color: #2D3748; margin-bottom: 15px;">
+        Abor de belakuk ku kateh gambar ni? (Apakah yang dilakukan oleh murid dalam gambar?)
+      </p>
+      <div class="options-grid">
+        <button class="btn-choice" onclick="checkInduksi(false)">Menman (Bermain)</button>
+        <button class="btn-choice" onclick="checkInduksi(true)">Benelajar (Belajar)</button>
+        <button class="btn-choice" onclick="checkInduksi(false)">Cip (Berjalan)</button>
+      </div>
+      <div class="feedback-box" id="feedback-induksi"></div>
+    </div>
+  </div>
+
+  <!-- Skrin Langkah 1 -->
+  <div id="screen-step1" class="screen">
+    <div class="instruction-box">
+      <span><strong>Langkah 1:</strong> Fahami perbezaan Suku Kata Terbuka (Suku Kate Tebuke): 2 Suku Kata (Nar) dan 3 Suku Kata (Nik).</span>
+      <button class="audio-icon-btn" onclick="speak('Fahami perbezaan Suku Kata Terbuka: Nar dan Nik suku kate tebuke.')">🔊</button>
+    </div>
+
+    <div class="activity-card">
+      <h3 style="color: #2B6CB0; margin-bottom: 15px;">Penerangan & Contoh Engrok</h3>
+      
+      <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+        <div style="background: #EBF8FF; border: 2px solid #3182CE; padding: 15px; border-radius: 12px; width: 220px;">
+          <h4 style="color: #2B6CB0;">2 Suku Kate (Nar)</h4>
+          <p style="font-size: 20px; font-weight: bold; margin-top: 8px;">ba - ku</p>
+          <p style="font-size: 20px; font-weight: bold;">la - pa</p>
+          <button class="btn-main" style="padding: 6px 12px; font-size: 14px; margin-top: 10px;" onclick="speak('Contoh dua suku kata terbuka: baku, lapa')">🔊 Dengar</button>
+        </div>
+
+        <div style="background: #FEFCBF; border: 2px solid #D69E2E; padding: 15px; border-radius: 12px; width: 220px;">
+          <h4 style="color: #D69E2E;">3 Suku Kate (Nik)</h4>
+          <p style="font-size: 20px; font-weight: bold; margin-top: 8px;">pe - na - nei</p>
+          <p style="font-size: 20px; font-weight: bold;">ke - la - ba</p>
+          <button class="btn-main" style="padding: 6px 12px; font-size: 14px; margin-top: 10px;" onclick="speak('Contoh tiga suku kata terbuka: penanei, kelaba')">🔊 Dengar</button>
+        </div>
+      </div>
+
+      <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Soalan Uji Kefahaman: Manakah antara berikut mempunyai 3 suku kata (Nik)?</p>
+      <div class="options-grid">
+        <button class="btn-choice" onclick="checkStep1(false)">baku</button>
+        <button class="btn-choice" onclick="checkStep1(true)">penanei</button>
+        <button class="btn-choice" onclick="checkStep1(false)">mita</button>
+      </div>
+      <div class="feedback-box" id="feedback-step1"></div>
+    </div>
+  </div>
+
+  <!-- Skrin Langkah 2 -->
+  <div id="screen-step2" class="screen">
+    <div class="instruction-box">
+      <span><strong>Langkah 2 (Aktiviti Kad Engrok):</strong> Pengelasan Kad Engrok. Klik pada perkataan kemudian klik pada kumpulan yang betul!</span>
+      <button class="audio-icon-btn" onclick="speak('Pengelasan kad engrok. Tekan kad perkataan dan masukkan dalam kumpulan yang betul.')">🔊</button>
+    </div>
+
+    <div class="activity-card">
+      <div class="cards-pool" id="cards-pool">
+        <div class="word-card" onclick="selectCard(this, 2)">baku</div>
+        <div class="word-card" onclick="selectCard(this, 3)">penanei</div>
+        <div class="word-card" onclick="selectCard(this, 2)">lapa</div>
+        <div class="word-card" onclick="selectCard(this, 3)">kelaba</div>
+        <div class="word-card" onclick="selectCard(this, 2)">mita</div>
+        <div class="word-card" onclick="selectCard(this, 3)">kemude</div>
+        <div class="word-card" onclick="selectCard(this, 2)">kate</div>
+        <div class="word-card" onclick="selectCard(this, 3)">kerani</div>
+      </div>
+
+      <div class="sorting-container">
+        <div class="drop-zone" id="zone-2">
+          <h4>2 Suku Kate (Nar)</h4>
+          <div id="pool-2" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+        <div class="drop-zone" id="zone-3">
+          <h4>3 Suku Kate (Nik)</h4>
+          <div id="pool-3" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+      </div>
+
+      <div class="feedback-box" id="feedback
